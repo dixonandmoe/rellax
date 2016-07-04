@@ -104,16 +104,18 @@
 				ScrollTriggerLoop = true;
 				
 				ScrollTrigger.attach(animate);
-				
-				// Resize is not called by ScrollTrigger
-				window.addEventListener('resize', function(){
-				  animate();
-				});
+			} else {
+				// The loop will start by calling update just once
+				update();
 			}
 			
-			// If ScrollTrigger is not found, our own loop
-			// will start by calling animate just once
-      animate();
+			window.addEventListener('resize', function(){
+			  animate();
+			});
+			
+			// update only calls animate if the scrollPosition changed,
+			// so call animate() to make sure the transforms are set
+			animate();
     };
 
 
@@ -187,29 +189,31 @@
       }
       return false;
     };
-
+		
+		var update = function() {
+			// setPosition() returns true if the scroll position changed
+			// if it changed, then we loop through the elements
+			if (setPosition()) {
+				animate();
+		  }
+		  
+		  // loop again
+		  loop(update);
+		};
 
     // Transform3d on parallax element
     var animate = function() {
-    	if (setPosition()) {
-				// setPosition() returns true if the scroll position changed
-				// if it changed, then we loop through the elements
-				for (var i = 0; i < self.elems.length; i++){
-	        var percentage = ((posY - blocks[i].top + screenY) / (blocks[i].height + screenY));
-	
-	        // Subtracting initialize value, so element stays in same spot as HTML
-	        var position = updatePosition(percentage, blocks[i].speed) - blocks[i].base;
-	
-	        // Move that element
-	        var translate = 'translate3d(0,' + position + 'px' + ',0)' + blocks[i].style;
-	        self.elems[i].style.cssText = '-webkit-transform:'+translate+';-moz-transform:'+translate+';transform:'+translate+';';
-	      }
-      }
-      
-      if (!ScrollTriggerLoop) {
-      	// ScrollTrigger is not handling the loop,
-      	// so loop again
-      	loop(animate);
+    	setPosition();
+    	
+			for (var i = 0; i < self.elems.length; i++){
+        var percentage = ((posY - blocks[i].top + screenY) / (blocks[i].height + screenY));
+
+        // Subtracting initialize value, so element stays in same spot as HTML
+        var position = updatePosition(percentage, blocks[i].speed) - blocks[i].base;
+
+        // Move that element
+        var translate = 'translate3d(0,' + position + 'px' + ',0)' + blocks[i].style;
+        self.elems[i].style.cssText = '-webkit-transform:'+translate+';-moz-transform:'+translate+';transform:'+translate+';';
       }
     };
 

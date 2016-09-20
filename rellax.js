@@ -172,27 +172,36 @@
     };
 
 
-    //
-		var update = function() {
-			if (setPosition()) {
-				animate();
-	    }
-	    
-	    // loop again
-	    loop(update);
-		};
-		
+    // update element position
+    var update = function() {
+      if (setPosition()) {
+        animate();
+      }
+
+      // loop again
+      loop(update);
+    };
+
+
     // Transform3d on parallax element
     var animate = function() {
-    	for (var i = 0; i < self.elems.length; i++){
-        var percentage = ((posY - blocks[i].top + screenY) / (blocks[i].height + screenY));
+      var area = (screenY + posY);
 
-        // Subtracting initialize value, so element stays in same spot as HTML
-        var position = updatePosition(percentage, blocks[i].speed) - blocks[i].base;
+      for (var i = 0; i < self.elems.length; i++) {
+        // get the dynamic (current) block position
+        var blockTop = self.elems[i].getBoundingClientRect().top;
 
-        // Move that element
-        var translate = 'translate3d(0,' + position + 'px' + ',0)' + blocks[i].style;
-        self.elems[i].style.cssText = '-webkit-transform:'+translate+';-moz-transform:'+translate+';transform:'+translate+';';
+        // only move elements inside the current viewport
+        if (blockTop > 0 && blockTop < area && screenY > blockTop) {
+          var percentage = ((posY - blocks[i].top + screenY) / (blocks[i].height + screenY));
+
+          // Subtracting initialize value, so element stays in same spot as HTML
+          var position = updatePosition(percentage, blocks[i].speed) - blocks[i].base;
+
+          // Move that element
+          var translate = 'translate3d(0,' + position + 'px' + ',0)' + blocks[i].style;
+          self.elems[i].style.cssText = '-webkit-transform:'+translate+';-moz-transform:'+translate+';transform:'+translate+';';
+        }
       }
     };
 

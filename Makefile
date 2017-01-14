@@ -14,4 +14,4 @@ jshint: check
 	@jshint ${SRC}
 
 check:
-	@type jshint >/dev/null 2>&1 || echo 'Waring: missing jshint!'
+	@type jshint >/dev/null 2>&1 || echo 'Warning: missing jshint!'

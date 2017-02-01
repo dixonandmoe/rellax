@@ -68,21 +68,15 @@
       el = '.rellax';
     }
 
-    // Classes
-    if (document.getElementsByClassName(el.replace('.',''))){
-      self.elems = document.getElementsByClassName(el.replace('.',''));
-    }
+    // Get elements by class. If not possible, then by querySelector
+    var elemsByClass = document.getElementsByClassName(el.replace('.',''));
+    var elemsByQuery = document.querySelector(el);
+    self.elems = elemsByClass || elemsByQuery || null;
 
-    // Now query selector
-    else if (document.querySelector(el) !== false) {
-      self.elems = document.querySelector(el);
-    }
-
-    // The elements don't exist
-    else {
+    if (!self.elems) {
+      // Elements don't exist - throw
       throw new Error("The elements you're trying to select don't exist.");
     }
-
 
     // Let's kick this script off
     // Build array for cached element values

@@ -1,0 +1,20 @@
+{
+  "name": "rellax",
+  "description": "Lightweight, vanilla javascript parallax library",
+  "main": "rellax.js",
+  "authors": [
+    "Moe Amaya <moe@dixonandmoe.com> (https://dixonandmoe.com)"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "parallax"
+  ],
+  "homepage": "https://github.com/dixonandmoe/rellax",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

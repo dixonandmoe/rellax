@@ -66,6 +66,7 @@
       speed: -2,
       center: false,
       round: true,
+      offset: false,
     };
 
     // User defined options (might have more in the future)
@@ -152,6 +153,12 @@
 
       var base = updatePosition(percentage, speed);
 
+
+      if(el.getAttribute('data-offset') || self.options.offset) {
+        offset = Math.abs(base);
+      }
+
+      el.setAttribute('data-base', base);
       // ~~Store non-translate3d transforms~~
       // Store inline styles and extract transforms
       var style = el.style.cssText;
@@ -180,7 +187,8 @@
         height: blockHeight,
         speed: speed,
         style: style,
-        transform: transform
+        transform: transform,
+        offset: offset,
       };
     };
 
@@ -228,18 +236,20 @@
     // Transform3d on parallax element
     var animate = function() {
       for (var i = 0; i < self.elems.length; i++){
+        var elem = self.elems[i];
         var percentage = ((posY - blocks[i].top + screenY) / (blocks[i].height + screenY));
 
         // Subtracting initialize value, so element stays in same spot as HTML
-        var position = updatePosition(percentage, blocks[i].speed) - blocks[i].base;
+        var position = updatePosition(percentage, blocks[i].speed) - blocks[i].base - blocks[i].offset - elem.getAttribute('data-offset');
 
         // Move that element
         // (Set the new translation and append initial inline transforms.)
         var translate = 'translate3d(0,' + position + 'px,0) ' + blocks[i].transform;
-        self.elems[i].style[transformProp] = translate;
+        elem.style[transformProp] = translate;
       }
     };
 
+    self.animate = animate;
 
     self.destroy = function() {
       for (var i = 0; i < self.elems.length; i++){

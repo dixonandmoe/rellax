@@ -153,7 +153,7 @@
 
       var base = updatePosition(percentage, speed);
 
-
+      var offset = 0;
       if(el.getAttribute('data-offset') || self.options.offset) {
         offset = Math.abs(base);
       }

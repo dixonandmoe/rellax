@@ -481,7 +481,7 @@
                 if(block.parallax) {
                     var percentage = (posY + screenY - block.context.percent0 / (block.context.height + screenY));
 
-                    var position = updatePosition(percentage, block.parallax.speed) - block.parallax.base - block.parallax.offset - block.el.dataset.offset;
+                    var position = updatePosition(percentage, block.parallax.speed) - block.parallax.base - block.parallax.offset - (block.el.dataset.offset || 0);
 
                     block.el.style[transformProp] = 'translate3d(0,' + position + 'px,0) ' + block.originalCSS.transform;
                 } else if(block.animations && block.animations.length) {

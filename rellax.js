@@ -323,8 +323,6 @@
             });
         }
 
-        //var last20 =[];
-
         // set scroll position (posY)
         // side effect method is not ideal, but okay for now
         // returns true if the scroll changed, false if nothing happened
@@ -387,9 +385,11 @@
 
         var prevOrNextFrame = function(animations, i) {
             var frame = nextFrame(animations, i);
+            console.log('nextframe', frame, i);
 
             if(!frame) {
                 frame = prevFrame(animations, i);
+                console.log('prevframe', frame, i);
             }
 
             return frame;
@@ -397,6 +397,11 @@
 
         // find animation frame, new currentanim and possibly percentage
         var findAnimationFrame = function(currentanim, animations, bottomViewportPositionAbsolute) {
+            // IE Hack
+            if(!posY) {
+                return null;
+            }
+
             var newAnimationIndex = currentanim;
             var percentage = null;
 
@@ -413,7 +418,7 @@
                 } else {
                     // Am I inside the animation now? Find the correct one and return it.
                     for(var i = 0; i < animations.length; i++) {
-                        if(insideAnimation(animations[i], bottomViewportPositionAbsolute)) {
+                        if(insideAnimation(animations[i], bottomViewportPositionAbsolute) === 0) {
                             return { animation: prevOrNextFrame(animations, i), percentage: null, index: i }
                         }
                     }

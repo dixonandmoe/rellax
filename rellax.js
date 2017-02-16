@@ -216,15 +216,11 @@
 
                         break;
 
-                    case 'fade_in':
-                        animation.type = TYPE_OPACITY;
-
-                        break;
-
                     case 'fade_out':
-                        animation.type = TYPE_OPACITY;
                         animation.reverse = true;
 
+                    case 'fade_in':
+                        animation.type = TYPE_OPACITY;
                         break;
 
                     case 'delay':
@@ -242,6 +238,8 @@
                     animations.push(animation);
                 }
             }
+
+            animations.block = block;
 
             return animations;
         }
@@ -369,74 +367,157 @@
             loop(update);
         };
 
-        var animateAnimation = function(block, animation, bottomViewportPositionAbsolute, force) {
-            if(!force && (bottomViewportPositionAbsolute - animation.start < 0 || bottomViewportPositionAbsolute - animation.stop > 0)) {
-                return false;
+        var insideAnimation = function(animation, bottomViewportPositionAbsolute) {
+            return (bottomViewportPositionAbsolute - animation.start < 0) ? -1: (bottomViewportPositionAbsolute - animation.stop > 0) ? 1: 0;
+        }
+
+        var nextFrame = function(animations, i) {
+            while(animations[i] && animations[i].type == TYPE_DELAY) {
+                i++;
             }
 
-            // create some sure-fire way to make
-            var percentage = clamp((bottomViewportPositionAbsolute - animation.start) / (animation.length), 0, 1);
+            return animations[i];
+        }
 
-            switch(animation.type) {
-                case TYPE_MOVE:
-                    var progress = (animation.reverse ? (1 - percentage): percentage);
-
-                    var tx = animation.values.x * progress;
-                    var ty = animation.values.y * progress;
-
-                    var translate = 'translate3d(' + tx + 'px,' + ty + 'px,0) ' + block.originalCSS.transform;
-                    block.el.style[transformProp] = translate;
-                    break;
-
-                case TYPE_OPACITY:
-                    block.el.style['opacity'] = (animation.reverse ? (1 - percentage): percentage);
-                    break;
+        var prevFrame = function(animations, i) {
+            while(animations[i] && animations[i].type == TYPE_DELAY) {
+                i--;
             }
 
-            return true;
+            return animations[i];
+        }
+
+        var prevOrNextFrame = function(animations, i) {
+            var frame = nextFrame(animations, i);
+
+            if(!frame) {
+                frame = prevFrame(animations, i);
+            }
+
+            return frame;
+        }
+
+        // find animation frame, new currentanim and possibly percentage
+        var findAnimationFrame = function(currentanim, animations, bottomViewportPositionAbsolute) {
+            var newAnimationIndex = currentanim;
+            var percentage = null;
+
+            // Do this only on initialization
+            if(currentanim === null) {
+                if(bottomViewportPositionAbsolute - animations[0].start < 0) {
+                    // Am I before the animation now? Return first animation to initialize at 0 percent and -1 index.
+                    return { animation: nextFrame(animations, 0), percentage: 0, index: -1 }
+
+                } else if(bottomViewportPositionAbsolute - animations[animations.length - 1].stop > 0) {
+                    // Am I after the animation now? Return last animation to initialize at 100 percent and [animations + 1] index.
+                    return { animation: prevFrame(animations, animations.length - 1), percentage: 1, index: animations.length }
+
+                } else {
+                    // Am I inside the animation now? Find the correct one and return it.
+                    for(var i = 0; i < animations.length; i++) {
+                        if(insideAnimation(animations[i], bottomViewportPositionAbsolute)) {
+                            return { animation: prevOrNextFrame(animations, i), percentage: null, index: i }
+                        }
+                    }
+                }
+            }
+
+            /* Get the nearest animation (or the current one if we're in the middle) */
+            if(currentanim == -1) {
+                newAnimationIndex = 0;
+            } else if(currentanim == animations.length) {
+                newAnimationIndex = currentanim - 1;
+            }
+
+            var tryAnimation = animations[newAnimationIndex];
+
+            /* Am I inside it? */
+            var step = insideAnimation(tryAnimation, bottomViewportPositionAbsolute);
+
+            /* No. Need to find another one */
+            if(step !== 0) {
+                if(currentanim == -1 && step == -1) {
+                    /* Do nothing, I am still before the animations */
+                    return null;
+                } else if(currentanim == animations.length && step == 1) {
+                    /* Do nothing, I am still after the animations */
+                    return null;
+                } else {
+                    /* I'm switching from animation with index currentanim */
+                    if(currentanim == 0 && step == -1) {
+                        /* I'm leaving the animation at the top */
+                        return { animation: animations[0], percentage: 0, index: -1 }
+
+                    } else if(currentanim == animations.length - 1 && step == 1) {
+                        /* I'm leaving the animation th the bottom */
+                        return { animation: animations[animations.length - 1], percentage: 1, index: animations.length }
+
+                    } else {
+                        /* I'm switching between two animations */
+                        if(animations[currentanim + step].type == TYPE_DELAY) {
+                            /* I'm on delay step, just finish the current animation */
+                            return { animation: animations[currentanim], percentage: step === 1? 1: 0, index: currentanim + step }
+                        }
+
+                        /* Just start new animation */
+                        return { animation: animations[currentanim + step], index: currentanim + step, percentage: null }
+                    }
+                }
+            }
+
+            /* Play current animation (or the first top/bottom one) */
+            return { animation: tryAnimation, percentage: null, index: newAnimationIndex }
         }
 
         // Transform3d on parallax element
         var animate = function() {
-            // no animations needed
-            var animations_ran = false;
-
             for (var i = 0; i < self.blocks.length; i++) {
                 var block = self.blocks[i];
-                var bottomViewportPositionAbsolute = posY + screenY;
 
                 // Right now parallax is exclusive with animations
                 if(block.parallax) {
-                    var bottomViewportPositionRelativeToCanvas = bottomViewportPositionAbsolute - block.context.percent0;
-                    var percentage = (bottomViewportPositionRelativeToCanvas / (block.context.height + screenY));
+                    var percentage = (posY + screenY - block.context.percent0 / (block.context.height + screenY));
 
                     var position = updatePosition(percentage, block.parallax.speed) - block.parallax.base - block.parallax.offset - block.el.dataset.offset;
 
-                    var translate = 'translate3d(0,' + position + 'px,0) ' + block.originalCSS.transform;
-                    block.el.style[transformProp] = translate;
-
+                    block.el.style[transformProp] = 'translate3d(0,' + position + 'px,0) ' + block.originalCSS.transform;
                 } else if(block.animations && block.animations.length) {
-                    for(var j = 0; j < block.animations.length; j++) {
-                        var animation = block.animations[j];
+                    var bottomViewportPositionAbsolute = posY + screenY;
 
-                        if(animateAnimation(block, animation, bottomViewportPositionAbsolute)) {
-                            animations_ran = true;
-                            block.currentanim = j;
+                    // frame -> currentAnimationFrame
+                    var frame = findAnimationFrame(block.currentanim, block.animations, bottomViewportPositionAbsolute);
 
-                            break;
-                        }
+                    if(frame === null) {
+                        continue;
                     }
 
-                    if (animations_ran === false && block.currentanim !== null) {
-                        animateAnimation(block, animation, bottomViewportPositionAbsolute, true);
+                    // border case, where the only animation is a delay
+                    if(!frame.animation) {
+                        continue;
+                    }
 
-                        block.currentanim = null;
+                    block.currentanim = frame.index;
+
+                    if(frame.percentage === null) {
+                        frame.percentage = clamp((bottomViewportPositionAbsolute - frame.animation.start) / (frame.animation.length), 0, 1);
+                    }
+
+                    switch(frame.animation.type) {
+                        case TYPE_MOVE:
+                            var progress = (frame.animation.reverse ? (1 - frame.percentage): frame.percentage);
+
+                            var tx = frame.animation.values.x * progress;
+                            var ty = frame.animation.values.y * progress;
+
+                            var translate = 'translate3d(' + tx + 'px,' + ty + 'px,0) ' + block.originalCSS.transform;
+                            block.el.style[transformProp] = translate;
+                            break;
+
+                        case TYPE_OPACITY:
+                            block.el.style['opacity'] = (frame.animation.reverse ? (1 - frame.percentage): frame.percentage);
+                            break;
                     }
                 }
-
-
-
-                //console.log('hi', translate);
             }
         };
 

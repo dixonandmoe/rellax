@@ -12,17 +12,17 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define([], factory);
+        define(['jquery'], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        module.exports = factory();
+        module.exports = factory(require('jquery'));
     } else {
         // Browser globals (root is window)
-        root.Rellax = factory();
+        root.Rellax = factory(root.jQuery);
     }
-}(this, function () {
+}(this, function ($) {
     var Rellax = function(el, options){
         "use strict";
 
@@ -32,6 +32,10 @@
         var screenY = 0;
         var blocks = [];
         var pause = false;
+
+        var TYPE_MOVE = 2;
+        var TYPE_OPACITY = 1;
+        var TYPE_DELAY = 3;
 
         // check what requestAnimationFrame to use, and if
         // it's not supported, use the onscroll event
@@ -63,15 +67,15 @@
 
         // Default Settings
         self.options = {
-            speed: -2,
-            center: false,
             round: true,
             offset: false,
+            contextClass: '.showcase-canvas',
+            unit: 750,
         };
 
         // User defined options (might have more in the future)
-        if (options){
-            Object.keys(options).forEach(function(key){
+        if (options) {
+            Object.keys(options).forEach(function(key) {
                 self.options[key] = options[key];
             });
         }
@@ -84,18 +88,10 @@
             el = '.rellax';
         }
 
-        var elements = document.querySelectorAll(el);
+        var elements = $(el);
 
-        // Now query selector
-        if (elements.length > 0) {
-            self.elems = elements;
-        }
-
-        // The elements don't exist
-        else {
-            throw new Error("The elements you're trying to select don't exist.");
-        }
-
+        self.$elems = elements;
+        self.blocks = blocks;
 
         // Let's kick this script off
         // Build array for cached element values
@@ -105,10 +101,14 @@
             setPosition();
 
             // Get and cache initial position of all elements
-            for (var i = 0; i < self.elems.length; i++){
-                var block = createBlock(self.elems[i]);
+            self.$elems.each(function() {
+                var block = createBlock(this);
+
+                block.parallax = decorateWithParallax(block);
+                block.animations = decorateWithAnimations(block);
+
                 blocks.push(block);
-            }
+            });
 
             window.addEventListener('resize', function(){
                 animate();
@@ -122,43 +122,153 @@
             animate();
         };
 
+        var decorateWithParallax = function(block) {
+            var dataSpeed = block.$el.data('rellax-speed');
+
+            if(!dataSpeed) {
+                return null;
+            }
+
+            var speed = clamp(dataSpeed, -10, 10);
+            var base = updatePosition(0.5, speed);
+
+            block.$el.data('base', base);
+
+            var offset = 0;
+            if(block.$el.data('offset') || self.options.offset) {
+                offset = Math.abs(base);
+            }
+
+            return {
+                base: base,
+                speed: speed,
+                offset: offset,
+            }
+        }
+
+        var moveAnimation = function(animation, value, axis) {
+            var values = {x: 0, y: 0};
+
+            values[axis] = value;
+
+            animation.values = values;
+            animation.type = TYPE_MOVE;
+
+            return animation;
+        }
+
+        var axis = function(direction) {
+            switch (direction) {
+                case 'top':
+                case 'bottom':
+                    return 'y';
+                case 'left':
+                case 'right':
+                    return 'x';
+            }
+        }
+
+        var decorateWithAnimations = function(block) {
+            var animations = [];
+
+            var unparsedAnimations = block.$el.data('animate');
+            if(!unparsedAnimations) {
+                return;
+            }
+
+            unparsedAnimations = unparsedAnimations.split('|');
+
+            var durationStart = 0;
+
+            for(var i = 0; i < unparsedAnimations.length; i++) {
+                var bits = unparsedAnimations[i].split(',');
+
+                var animationType = bits[0];
+                var durationInUnits = parseFloat(bits[1]);
+
+                var horizontalMove = block.context.$el.width();
+                var verticalMove = block.context.$el.height();
+
+                var animation = {};
+
+                switch(animationType) {
+                    case 'move_in':
+                        var direction = bits[2];
+
+                        animation.reverse = true;
+                    case 'move_out':
+                        var direction = bits[2];
+
+                        switch(direction) {
+                            case 'left':
+                                animation = moveAnimation(animation, -horizontalMove, axis(direction));
+                                break;
+                            case 'right':
+                                animation = moveAnimation(animation, horizontalMove, axis(direction));
+                                break;
+                            case 'top':
+                                animation = moveAnimation(animation, -verticalMove, axis(direction));
+                                break;
+                            case 'bottom':
+                                animation = moveAnimation(animation, verticalMove, axis(direction));
+                                break;
+                        }
+
+                        break;
+
+                    case 'fade_in':
+                        animation.type = TYPE_OPACITY;
+
+                        break;
+
+                    case 'fade_out':
+                        animation.type = TYPE_OPACITY;
+                        animation.reverse = true;
+
+                        break;
+
+                    case 'delay':
+                        animation.type = TYPE_DELAY;
+                        break;
+                }
+
+                animation.start = block.context.percent0 + (self.options.unit * durationStart);
+                animation.length = (self.options.unit * durationInUnits);
+                animation.stop = animation.start + animation.length;
+
+                durationStart += durationInUnits;
+
+                if(animation.type) {
+                    animations.push(animation);
+                }
+            }
+
+            return animations;
+        }
 
         // We want to cache the parallax blocks'
         // values: base, top, height, speed
         // el: is dom object, return: el cache values
         var createBlock = function(el) {
-            var dataPercentage = el.dataset.rellaxPercentage;
-            var dataSpeed = el.dataset.rellaxSpeed;
+            var $el = $(el);
 
-            // initializing at scrollY = 0 (top of browser)
-            // ensures elements are positioned based on HTML layout.
-            //
-            // If the element has the percentage attribute, the posY needs to be
-            // the current scroll position's value, so that the elements are still positioned based on HTML layout
-            var posY = dataPercentage || self.options.center ? (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop) : 0;
+            // get canvas as the context element for each layer/parallax item
+            var $context = $el.is(self.options.contextClass) ? $el : $el.closest(self.options.contextClass);
+            var context = $context.get(0);
 
-            var blockTop = posY + el.getBoundingClientRect().top;
-            var blockHeight = el.clientHeight || el.offsetHeight || el.scrollHeight;
+            var posY = (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop);
 
-            // apparently parallax equation everyone uses
-            var percentage = dataPercentage ? dataPercentage : (posY - blockTop + screenY) / (blockHeight + screenY);
-            if(self.options.center){ percentage = 0.5; }
+            var contextPercent0 = posY + el.getBoundingClientRect().top;
+            var contextHeight = $context.height();
+            var contextPercent100 = contextPercent0 + contextHeight;
 
-            // Optional individual block speed as data attr, otherwise global speed
-            // Check if has percentage attr, and limit speed to 5, else limit it to 10
-            var speed = dataSpeed ? clamp(dataSpeed, -10, 10) : self.options.speed;
-            if (dataPercentage || self.options.center) {
-                speed = clamp(dataSpeed || self.options.speed, -5, 5);
-            }
+            var blockRect = el.getBoundingClientRect();
 
-            var base = updatePosition(percentage, speed);
+            var blockTop = blockRect.top;
+            var blockLeft = blockRect.left;
+            var blockHeight = $el.height();
+            var blockWidth = $el.width();
 
-            var offset = 0;
-            if(el.getAttribute('data-offset') || self.options.offset) {
-                offset = Math.abs(base);
-            }
-
-            el.setAttribute('data-base', base);
             // ~~Store non-translate3d transforms~~
             // Store inline styles and extract transforms
             var style = el.style.cssText;
@@ -182,15 +292,42 @@
             }
 
             return {
-                base: base,
-                top: blockTop,
+                el: el,
+                $el: $el,
+                currentanim: null,
+                topFromViewport: blockTop,
+                topAbsolute: blockTop + posY,
+                leftFromViewport: blockLeft,
+                width: blockWidth,
                 height: blockHeight,
-                speed: speed,
-                style: style,
-                transform: transform,
-                offset: offset,
+                context: {
+                    el: context,
+                    $el: $context,
+                    percent0: contextPercent0,
+                    percent100: contextPercent100,
+                    height: contextHeight,
+                },
+                originalCSS: {
+                    style: style,
+                    transform: transform,
+                },
+                translate: {
+                    x: 0,
+                    y: 0
+                }
             };
         };
+
+        if(/Edge\/\d./i.test(navigator.userAgent)) {
+            $('body').on("mousewheel", function (ev) {
+                ev.preventDefault();
+                var wd = ev.originalEvent.wheelDelta;
+                var csp = window.pageYOffset;
+                window.scrollTo(0, csp - wd);
+            });
+        }
+
+        //var last20 =[];
 
         // set scroll position (posY)
         // side effect method is not ideal, but okay for now
@@ -223,7 +360,6 @@
         };
 
 
-        //
         var update = function() {
             if (setPosition() && pause === false) {
                 animate();
@@ -233,19 +369,74 @@
             loop(update);
         };
 
+        var animateAnimation = function(block, animation, bottomViewportPositionAbsolute, force) {
+            if(!force && (bottomViewportPositionAbsolute - animation.start < 0 || bottomViewportPositionAbsolute - animation.stop > 0)) {
+                return false;
+            }
+
+            // create some sure-fire way to make
+            var percentage = clamp((bottomViewportPositionAbsolute - animation.start) / (animation.length), 0, 1);
+
+            switch(animation.type) {
+                case TYPE_MOVE:
+                    var progress = (animation.reverse ? (1 - percentage): percentage);
+
+                    var tx = animation.values.x * progress;
+                    var ty = animation.values.y * progress;
+
+                    var translate = 'translate3d(' + tx + 'px,' + ty + 'px,0) ' + block.originalCSS.transform;
+                    block.el.style[transformProp] = translate;
+                    break;
+
+                case TYPE_OPACITY:
+                    block.el.style['opacity'] = (animation.reverse ? (1 - percentage): percentage);
+                    break;
+            }
+
+            return true;
+        }
+
         // Transform3d on parallax element
         var animate = function() {
-            for (var i = 0; i < self.elems.length; i++){
-                var elem = self.elems[i];
-                var percentage = ((posY - blocks[i].top + screenY) / (blocks[i].height + screenY));
+            // no animations needed
+            var animations_ran = false;
 
-                // Subtracting initialize value, so element stays in same spot as HTML
-                var position = updatePosition(percentage, blocks[i].speed) - blocks[i].base - blocks[i].offset - elem.getAttribute('data-offset');
+            for (var i = 0; i < self.blocks.length; i++) {
+                var block = self.blocks[i];
+                var bottomViewportPositionAbsolute = posY + screenY;
 
-                // Move that element
-                // (Set the new translation and append initial inline transforms.)
-                var translate = 'translate3d(0,' + position + 'px,0) ' + blocks[i].transform;
-                elem.style[transformProp] = translate;
+                // Right now parallax is exclusive with animations
+                if(block.parallax) {
+                    var bottomViewportPositionRelativeToCanvas = bottomViewportPositionAbsolute - block.context.percent0;
+                    var percentage = (bottomViewportPositionRelativeToCanvas / (block.context.height + screenY));
+
+                    var position = updatePosition(percentage, block.parallax.speed) - block.parallax.base - block.parallax.offset - block.el.dataset.offset;
+
+                    var translate = 'translate3d(0,' + position + 'px,0) ' + block.originalCSS.transform;
+                    block.el.style[transformProp] = translate;
+
+                } else if(block.animations && block.animations.length) {
+                    for(var j = 0; j < block.animations.length; j++) {
+                        var animation = block.animations[j];
+
+                        if(animateAnimation(block, animation, bottomViewportPositionAbsolute)) {
+                            animations_ran = true;
+                            block.currentanim = j;
+
+                            break;
+                        }
+                    }
+
+                    if (animations_ran === false && block.currentanim !== null) {
+                        animateAnimation(block, animation, bottomViewportPositionAbsolute, true);
+
+                        block.currentanim = null;
+                    }
+                }
+
+
+
+                //console.log('hi', translate);
             }
         };
 

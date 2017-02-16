@@ -239,8 +239,6 @@
                 }
             }
 
-            animations.block = block;
-
             return animations;
         }
 
@@ -486,6 +484,8 @@
 
                     // frame -> currentAnimationFrame
                     var frame = findAnimationFrame(block.currentanim, block.animations, bottomViewportPositionAbsolute);
+
+                    //console.log('block', i, block.$el, 'frame', frame);
 
                     if(frame === null) {
                         continue;

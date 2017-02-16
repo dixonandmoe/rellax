@@ -385,11 +385,9 @@
 
         var prevOrNextFrame = function(animations, i) {
             var frame = nextFrame(animations, i);
-            console.log('nextframe', frame, i);
 
             if(!frame) {
                 frame = prevFrame(animations, i);
-                console.log('prevframe', frame, i);
             }
 
             return frame;
@@ -479,7 +477,7 @@
 
                 // Right now parallax is exclusive with animations
                 if(block.parallax) {
-                    var percentage = (posY + screenY - block.context.percent0 / (block.context.height + screenY));
+                    var percentage = (posY + screenY - block.context.percent0) / (block.context.height + screenY);
 
                     var position = updatePosition(percentage, block.parallax.speed) - block.parallax.base - block.parallax.offset - (block.el.dataset.offset || 0);
 

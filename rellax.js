@@ -345,14 +345,35 @@
             return self.options.round ? Math.round(value) : value;
         };
 
+        // just be sure to set correct values at the last frame
+        var lastFrame = function() {
+            //console.log('lastframe');
+            self.$elems.css({
+                'opacity': 1,
+                'transform': 'translateZ(0)'
+            });
+            self.$elems.removeData('base');
+            self.$elems.removeData('offset');
+
+            self.$elems.each(function(i) {
+                this.style.cssText = blocks[i].style;
+            });
+        }
 
         var update = function() {
+            //console.log('update');
             if (setPosition() && pause === false) {
+                console.log('will animate');
                 animate();
             }
 
-            // loop again
-            loop(update);
+            if(pause === false ) {
+                //console.log('loop -> nextframe');
+                loop(update);
+            } else {
+                //console.log('loop -> last frame')
+                loop(lastFrame);
+            }
         };
 
         var insideAnimation = function(animation, bottomViewportPositionAbsolute) {
@@ -464,6 +485,10 @@
 
         // Transform3d on parallax element
         var animate = function() {
+            if(pause === true) {
+                return;
+            }
+
             for (var i = 0; i < self.blocks.length; i++) {
                 var block = self.blocks[i];
 
@@ -519,10 +544,6 @@
         self.animate = animate;
 
         self.destroy = function() {
-            self.$elems.each(function(i) {
-                this.style.cssText = blocks[i].style;
-            });
-
             pause = true;
         };
 

@@ -315,15 +315,6 @@
             };
         };
 
-        if(/Edge\/\d./i.test(navigator.userAgent)) {
-            $('body').on("mousewheel", function (ev) {
-                ev.preventDefault();
-                var wd = ev.originalEvent.wheelDelta;
-                var csp = window.pageYOffset;
-                window.scrollTo(0, csp - wd);
-            });
-        }
-
         // set scroll position (posY)
         // side effect method is not ideal, but okay for now
         // returns true if the scroll changed, false if nothing happened
@@ -528,15 +519,27 @@
         self.animate = animate;
 
         self.destroy = function() {
-            for (var i = 0; i < self.elems.length; i++){
-                self.elems[i].style.cssText = blocks[i].style;
-            }
+            self.$elems.each(function(i) {
+                this.style.cssText = blocks[i].style;
+            });
+
             pause = true;
         };
-
 
         init();
         return self;
     };
+
+    if(/Edge\/\d./i.test(navigator.userAgent)) {
+        $('body').on("mousewheel", function (ev) {
+            ev.preventDefault();
+            var wd = ev.originalEvent.wheelDelta;
+            var csp = window.pageYOffset;
+            window.scrollTo(0, csp - wd);
+        });
+    }
+
+    Rellax.edgeHackApplied = true;
+
     return Rellax;
 }));

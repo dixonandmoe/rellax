@@ -1,10 +1,11 @@
 
 // ------------------------------------------
-// Rellax.js - v1.0.0
-// Buttery smooth parallax library
-// Copyright (c) 2016 Moe Amaya (@moeamaya)
+// BrightIT-Rellax.js - v1.1.0
+// Copyright (c) 2017 Michał Moroz (@dragonee)
 // MIT license
 //
+// Thanks to Rellax.js and Moe Amaya (@moeamaya)
+// for the original library
 // Thanks to Paraxify.js and Jaime Cabllero
 // for parallax concepts
 // ------------------------------------------

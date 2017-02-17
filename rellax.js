@@ -530,16 +530,26 @@
         return self;
     };
 
-    if(/Edge\/\d./i.test(navigator.userAgent)) {
-        $('body').on("mousewheel", function (ev) {
-            ev.preventDefault();
-            var wd = ev.originalEvent.wheelDelta;
-            var csp = window.pageYOffset;
-            window.scrollTo(0, csp - wd);
-        });
-    }
+    Rellax.edgeHackApplied = false;
 
-    Rellax.edgeHackApplied = true;
+    Rellax.applyEdgeHack = function() {
+        if(Rellax.edgeHackApplied) {
+            return;
+        }
+
+        if(/Edge\/\d./i.test(navigator.userAgent)) {
+            $('body').on("mousewheel", function (ev) {
+                ev.preventDefault();
+                var wd = ev.originalEvent.wheelDelta;
+                var csp = window.pageYOffset;
+                window.scrollTo(0, csp - wd);
+            });
+        }
+
+        Rellax.edgeHackApplied = true;
+    };
+
+    Rellax.applyEdgeHack();
 
     return Rellax;
 }));

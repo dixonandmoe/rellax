@@ -363,7 +363,7 @@
         var update = function() {
             //console.log('update');
             if (setPosition() && pause === false) {
-                console.log('will animate');
+                //console.log('will animate');
                 animate();
             }
 

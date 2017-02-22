@@ -240,6 +240,8 @@
                 }
             }
 
+            //animations.block = block;
+
             return animations;
         }
 
@@ -467,14 +469,24 @@
                         return { animation: animations[animations.length - 1], percentage: 1, index: animations.length }
 
                     } else {
+                        tryAnimation = animations[currentanim + step];
+                        if(insideAnimation(tryAnimation, bottomViewportPositionAbsolute) !== 0) {
+                            /*
+                             * Here we are lost. We probably have scrolled too much skipping one or more animation frames.
+                             * We should fallback to bruteforcing (reinitialization) of a frame.
+                             */
+                            //console.log('LOST @', currentanim, bottomViewportPositionAbsolute, tryAnimation, animations.block);
+                            return findAnimationFrame(null, animations, bottomViewportPositionAbsolute);
+                        }
+
                         /* I'm switching between two animations */
-                        if(animations[currentanim + step].type == TYPE_DELAY) {
+                        if(tryAnimation.type == TYPE_DELAY) {
                             /* I'm on delay step, just finish the current animation */
                             return { animation: animations[currentanim], percentage: step === 1? 1: 0, index: currentanim + step }
                         }
 
                         /* Just start new animation */
-                        return { animation: animations[currentanim + step], index: currentanim + step, percentage: null }
+                        return { animation: tryAnimation, index: currentanim + step, percentage: null }
                     }
                 }
             }

@@ -1,6 +1,6 @@
 
 // ------------------------------------------
-// BrightIT-Rellax.js - v1.1.0
+// BrightIT-Rellax.js - v1.1.1
 // Copyright (c) 2017 Michał Moroz (@dragonee)
 // MIT license
 //

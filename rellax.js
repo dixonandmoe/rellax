@@ -61,12 +61,13 @@
       return (num <= min) ? min : ((num >= max) ? max : num);
     };
 
-    // Default Settings
-    self.options = {
-      speed: -2,
-      center: false,
-      round: true,
-    };
+	// Default Settings
+	  self.options = {
+		  speed: -2,
+		  center: false,
+		  round: true,
+		  roundPercision: 1
+	  };
 
     // User defined options (might have more in the future)
     if (options){
@@ -211,7 +212,8 @@
     // Allow for decimal pixel values
     var updatePosition = function(percentage, speed) {
       var value = (speed * (100 * (1 - percentage)));
-      return self.options.round ? Math.round(value * 10) / 10 : value;
+      var factor = Math.pow(10, self.options.roundPercision);
+      return self.options.round ? Math.round(value * factor) / factor : value;
     };
 
 

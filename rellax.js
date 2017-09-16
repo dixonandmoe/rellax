@@ -66,6 +66,7 @@
       speed: -2,
       center: false,
       round: true,
+      others: '',
       callback: function() {},
     };
 
@@ -236,7 +237,7 @@
 
         // Move that element
         // (Set the new translation and append initial inline transforms.)
-        var translate = 'translate3d(0,' + position + 'px,0) ' + blocks[i].transform;
+        var translate = 'translate3d(0,' + position + 'px,0) ' + blocks[i].transform + ' ' + self.options.others;
         self.elems[i].style[transformProp] = translate;
       }
       self.options.callback(position);

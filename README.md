@@ -83,7 +83,7 @@ There's two ways to implement centering, either on specific elements or as a glo
   });
 </script>
 ```
-### Other Tranforms
+### Other Transforms
 As Rellax use css **transform**. So, it overwrites other transform but by **others** parameter you can define other transform parallely. 
 ```html
 <script>

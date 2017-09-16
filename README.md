@@ -83,6 +83,16 @@ There's two ways to implement centering, either on specific elements or as a glo
   });
 </script>
 ```
+### Other Tranforms
+As Rellax use css **transform**. So, it overwrites other transform but by **others** parameter you can define other transform parallely. 
+```html
+<script>
+  // Start Rellax
+  var rellax = new Rellax('.rellax-blur-card', {
+    others: 'rotate(45deg)'
+  });
+</script>
+```
 ## In the Wild
 If you're using Rellax in production, we'd love to list you here! Let us know: moe@dixonandmoe.com
 - [EthWorks](http://ethworks.io/)

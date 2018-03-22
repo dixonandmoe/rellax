@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <style>
+        html, body {
+            color: #223;
+            font-size: 21pt;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+            position: relative;
+        }
+
+        .Layout__wrapper-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .Layout__wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .Layout__main {
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: space-between;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            flex-grow: 1;
+            z-index: 1;
+        }
+
+        .page-content {
+            max-width: 100vw;
+            flex: 100%;
+        }
+
+        .col {
+            text-align: center;
+            width: 50%;
+            float: left;
+            box-sizing: border-box;
+        }
+
+        h4 {
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            outline: 1px solid #eed;
+            font-size: 42pt;
+            padding: 0 12.5vw;
+            height: 200vh;
+        }
+
+        .block {
+            background: #223;
+            color: #eed;
+            line-height: 25vh;
+            text-align: right;
+            margin-top: 20vh;
+            height: 200px;
+            width: 400px;
+            position: relative;
+        }
+
+        span {
+            background: #eed;
+            color: #223;
+            line-height: 25vh;
+            text-align: left;
+            padding: 0 42pt;
+            display: block;
+            width: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="Layout__wrapper-container">
+        <div class="Layout__wrapper">
+            <!-- Here can be fixed header -->
+            <main class="Layout__main">
+                <div class="page-content">
+                    <h4>data-rellax-speed = default</h4>
+                        <section>
+                            <div class="col">
+                                <br>With Percentage (0.5) <br><br>
+                                <div class="container">
+                                    <div class="block">
+                                        #1<span class="rellax" data-rellax-percentage="0.5">#1</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #2<span class="rellax" data-rellax-percentage="0.5">#2</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #3<span class="rellax" data-rellax-percentage="0.5">#3</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #4<span class="rellax" data-rellax-percentage="0.5" style="transition: transform 10s cubic-bezier(0,1,.5,1);">#4</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #5<span class="rellax" data-rellax-percentage="0.5" style="transition: transform 10s cubic-bezier(0,1,.5,1);">#5</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #6<span class="rellax" data-rellax-percentage="0.5" style="transition: transform 10s cubic-bezier(0,1,.5,1);">#6</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <br>Without Percentage <br><br>
+                                <div class="container">
+                                    <div class="block">
+                                        #1<span class="rellax" style="transition: transform 10s cubic-bezier(0,1,.5,1);">#1</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #2<span class="rellax" style="transition: transform 10s cubic-bezier(0,1,.5,1);">#2</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #3<span class="rellax" style="transition: transform 10s cubic-bezier(0,1,.5,1);">#3</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #4<span class="rellax">#4</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #5<span class="rellax">#5</span>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class="block">
+                                        #6<span class="rellax">#6</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+            <!-- Here can be fixed footer -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../rellax.js"></script>
+    <script>
+        var rellax = new Rellax('.rellax', {
+            center: true,
+            wrapper: document.querySelector('.Layout__main') // or '.Layout__main'
+        });
+    </script>
+</body>
+</html>

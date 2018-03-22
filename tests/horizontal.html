@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  <style>
+    html, body{
+      color: #223;
+      font-size: 21pt;
+      margin: 0; padding: 0;
+    }
+    body
+    {
+      display: -webkit-box;  /* OLD - iOS 6-, Safari 3.1-6, BB7 */
+      display: -ms-flexbox;  /* TWEENER - IE 10 */
+      display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
+      display: flex;         /* NEW, Spec - Firefox, Chrome, Opera */
+      width: 400vw;
+    }
+    nav{
+      font-size: 21pt;
+      line-height: 1.5em;
+      position: fixed;
+      bottom: 0; left: 0;
+    }
+    nav a{ color: inherit; }
+
+    section
+    {
+      width: 100vw;
+      height: 200vh;
+      -webkit-box-flex: 1;   /* OLD - iOS 6-, Safari 3.1-6 */
+      -webkit-flex: 1;       /* Safari 6.1+. iOS 7.1+, BB10 */
+      -ms-flex: 1;           /* IE 10 */
+      flex: 1;               /* NEW, Spec - Firefox, Chrome */
+    }
+
+    .col{
+      text-align: center;
+      width: 50%;
+      float: left;
+      box-sizing: border-box;
+    }
+
+    h4{ text-align: center;}
+
+    .container{
+      outline: 1px solid #eed;
+      font-size: 42pt;
+      padding: 37.5vh 12.5vw;
+    }
+    .block{
+      background: #223;
+      color: #eed;
+      line-height: 25vh;
+      text-align: right;
+      padding: 0 42pt;
+      position: relative;
+    }
+    span{
+      background: #eed;
+      color: #223;
+      line-height: 25vh;
+      text-align: left;
+      padding: 0 42pt;
+      display: block;
+      width: 50%;
+      position: absolute;
+      top: 0; left: 0;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+<section>
+  <div class="col">
+    <div class="container"><div class="block">#1<span class="rellax" data-rellax-speed="2">#1</span></div></div>
+  </div>
+  <div class="col">
+    <div class="container"><div class="block">#1<span class="rellax" data-rellax-speed="-2">#1</span></div></div>
+  </div>
+</section>
+
+
+<section>
+  <div class="col">
+    <div class="container"><div class="block">#2<span class="rellax" data-rellax-speed="4">#2</span></div></div>
+  </div>
+  <div class="col">
+    <div class="container"><div class="block">#2<span class="rellax" data-rellax-speed="-4">#2</span></div></div>
+  </div>
+</section>
+
+
+<section>
+  <div class="col">
+    <div class="container"><div class="block">#3<span class="rellax" data-rellax-speed="6" data-rellax-percentage="0.5">#3</span></div></div>
+  </div>
+  <div class="col">
+    <div class="container"><div class="block">#3<span class="rellax" data-rellax-speed="-6" data-rellax-percentage="0.5">#3</span></div></div>
+  </div>
+</section>
+
+
+<section>
+  <div class="col">
+    <div class="container"><div class="block">#4<span class="rellax" data-rellax-speed="8" data-rellax-percentage="0.5">#4</span></div></div>
+  </div>
+  <div class="col">
+    <div class="container"><div class="block">#4<span class="rellax" data-rellax-speed="-8" data-rellax-percentage="0.5">#4</span></div></div>
+  </div>
+</section>
+
+<!-- Scripts -->
+<script src="../rellax.js"></script>
+<script>
+  var rellax = new Rellax('.rellax', {horizontal: true, vertical: true});
+</script>
+</body>
+</html>

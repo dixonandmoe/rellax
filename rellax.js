@@ -149,6 +149,9 @@
       var dataSpeed = el.getAttribute( 'data-rellax-speed' );
       var dataZindex = el.getAttribute( 'data-rellax-zindex' ) || 0;
 
+      var dataWrapper = el.getAttribute('data-rellax-boundary');
+      var boundary = dataWrapper ? el.closest(dataWrapper) : null;
+
       // initializing at scrollY = 0 (top of browser), scrollX = 0 (left of browser)
       // ensures elements are positioned based on HTML layout.
       //
@@ -204,6 +207,7 @@
       return {
         baseX: bases.x,
         baseY: bases.y,
+        boundary: boundary,
         top: blockTop,
         left: blockLeft,
         height: blockHeight,
@@ -269,6 +273,22 @@
       loop(update);
     };
 
+    function getPosition(element) {
+      var xPosition = 0;
+      var yPosition = 0;
+
+      while (element) {
+        xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+        yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+        element = element.offsetParent;
+      }
+
+      return {
+        x: xPosition,
+        y: yPosition
+      };
+    }
+
     // Transform3d on parallax element
     var animate = function() {
       var positions;
@@ -280,6 +300,20 @@
         positions = updatePosition(percentageX, percentageY, blocks[i].speed);// - blocks[i].baseX;
         var positionY = positions.y - blocks[i].baseY;
         var positionX = positions.x - blocks[i].baseX;
+
+        // stop element from moving past the bottom of the wrapper, aka the stop point
+        // once it reaches the bottom, subtract the distance it went so it stays put
+        if(blocks[i].boundary) {
+
+          var distanceFromTop = getPosition(self.elems[i]).y + positionY + blocks[i].height;
+
+          var stopPoint = getPosition(blocks[i].boundary).y + blocks[i].boundary.clientHeight;
+
+          if(distanceFromTop > stopPoint && positionY > 0) {
+            var extra = distanceFromTop - stopPoint;
+            positionY = positionY - extra;
+          }
+        }
 
         var zindex = blocks[i].zindex;
 

@@ -85,7 +85,7 @@ This feature is intended for panoramic style websites, where users scroll horizo
 Note that this can work together at the same time with the default vertical parallax. If you do not want this, pass `vertical: false` in the settings block.
 
 ### Custom Wrapper
-By default, the position of parallax elements is determined via the scroll position of the body. Passing in the `wrapper` property will tell Rellax to watch that element instead. 
+By default, the position of parallax elements is determined via the scroll position of the body. Passing in the `wrapper` property will tell Rellax to watch that element instead.
 ```html
 <script>
   // Set wrapper to .custom-element instead of the body
@@ -93,6 +93,17 @@ By default, the position of parallax elements is determined via the scroll posit
     wrapper: '.custom-element'
   });
 </script>
+```
+
+### Bottom Boundary
+By default, the element will rellax infinitely as you scroll.  By setting the data-rellax-boundary to a valid parent element of the '.rellax', you can stop an element from rellaxing at a certain point.  This is useful if you don't want the element to overlay anymore.
+```html
+
+<div class="section" style="height:1000px;">
+    <div class="rellax" data-rellax-boundary=".section">
+        I won't move out past my parent div, .section!
+    </div>
+</div>
 ```
 
 ### Refresh

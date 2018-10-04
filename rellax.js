@@ -149,6 +149,7 @@
       var dataSpeed = el.getAttribute( 'data-rellax-speed' );
       var dataZindex = el.getAttribute( 'data-rellax-zindex' ) || 0;
 
+      var bounds = el.getAttribute('data-rellax-bounds') || 'both';
       var dataWrapper = el.getAttribute('data-rellax-boundary');
       var boundary = dataWrapper ? el.closest(dataWrapper) : null;
 
@@ -208,6 +209,7 @@
         baseX: bases.x,
         baseY: bases.y,
         boundary: boundary,
+        bounds: bounds,
         top: blockTop,
         left: blockLeft,
         height: blockHeight,
@@ -301,18 +303,39 @@
         var positionY = positions.y - blocks[i].baseY;
         var positionX = positions.x - blocks[i].baseX;
 
-        // stop element from moving past the bottom of the wrapper, aka the stop point
-        // once it reaches the bottom, subtract the distance it went so it stays put
+        // stop element from moving past the top / bottom of the wrapper, aka the start / stop point
+        // once it reaches the edge, subtract the distance it went so it stays put
         if(blocks[i].boundary) {
 
-          var distanceFromTop = getPosition(self.elems[i]).y + positionY + blocks[i].height;
+          var elemPosY = getPosition(self.elems[i]).y;
 
-          var stopPoint = getPosition(blocks[i].boundary).y + blocks[i].boundary.clientHeight;
+          var startPoint = getPosition(blocks[i].boundary).y;
+          var stopPoint = startPoint + blocks[i].boundary.clientHeight;
 
-          if(distanceFromTop > stopPoint && positionY > 0) {
-            var extra = distanceFromTop - stopPoint;
-            positionY = positionY - extra;
+          // if top bound is enabled
+          if(blocks[i].bounds != 'bottom') {
+            var topDistance = elemPosY + positionY;
+
+            // start at the top
+            if(topDistance < startPoint) {
+              var extra = startPoint - topDistance;
+              positionY = positionY + extra;
+            }
+
           }
+
+          // if bottom bound is enabled
+          if(blocks[i].bounds != 'top') {
+
+            var bottomDistance = elemPosY + positionY + blocks[i].height;
+
+            if(bottomDistance > stopPoint && positionY > 0) {
+              var extra = bottomDistance - stopPoint;
+              positionY = positionY - extra;
+            }
+
+          }
+
         }
 
         var zindex = blocks[i].zindex;

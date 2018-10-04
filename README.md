@@ -95,16 +95,29 @@ By default, the position of parallax elements is determined via the scroll posit
 </script>
 ```
 
-### Bottom Boundary
-By default, the element will rellax infinitely as you scroll.  By setting the data-rellax-boundary to a valid parent element of the '.rellax', you can stop an element from rellaxing at a certain point.  This is useful if you don't want the element to overlay anymore.
+### Boundary
+By default, the element will rellax infinitely as you scroll, completely removed from the scope of its parents.  By setting the data-rellax-boundary to a valid parent element of the '.rellax', you can stop an element from rellaxing beyond its parent.  This is useful if you don't want the element to overlay anymore.  This works in both directions - the rellaxed element will only move within its parents container.
 ```html
 
 <div class="section" style="height:1000px;">
     <div class="rellax" data-rellax-boundary=".section">
-        I won't move out past my parent div, .section!
+        I won't move outside of my parent div, .section!
     </div>
 </div>
 ```
+
+### Bounds - Top or Bottom
+If for some reason you want to boundary to only exist on the top or bottom of the parent, please add the data-rellax-bounds="top" or data-rellax-bounds="bottom". Of course, you need to set rellax-boundary to a valid parent, or it won't work.
+```html
+
+<div class="section" style="height:1000px;">
+    <div class="rellax" data-rellax-boundary=".section" data-rellax-bounds="bottom">
+        I won't move past the bottom of my parent div, .section!
+    </div>
+</div>
+```
+
+
 
 ### Refresh
 ```html

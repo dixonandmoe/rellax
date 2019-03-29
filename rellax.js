@@ -81,8 +81,15 @@
       el = '.rellax';
     }
 
-    // check if el is a className or a node
-    var elements = typeof el === 'string' ? document.querySelectorAll(el) : [el];
+    // Check if el is a selector, an array of nodes or just a node
+    var elements =
+      typeof el === 'string'
+      ? document.querySelectorAll(el)
+      : el instanceof NodeList || el instanceof HTMLCollection
+      ? [].slice.call(el)
+      : el instanceof Array
+      ? el
+      : [el];
 
     // Now query selector
     if (elements.length > 0) {

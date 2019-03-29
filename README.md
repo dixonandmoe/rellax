@@ -24,6 +24,10 @@ Have any suggestions or feedback? Reach out [@dixonandmoe](https://twitter.com/d
 <script>
   // Accepts any class name
   var rellax = new Rellax('.rellax');
+  // Accepts html elements
+  var rellax = new Rellax(document.querySelector('.rellax'));
+  // Accepts node lists, html collections and arrays of html elements
+  var rellax = new Rellax(document.querySelectorAll('.rellax'));
 </script>
 ```
 ```html

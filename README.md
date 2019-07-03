@@ -144,6 +144,22 @@ Instead of using a className you can use a node, handy when using React and you 
 
 var rellax = new Rellax(this.rellaxRef)
 ```
+Or, an array of nodes — useful when you have a `ref` containing multiple elements, like in this Vue component:
+```vue
+<template>
+  <div v-for="n in 3" :key="n" ref="rellax">
+    Why stop at just one?
+  </div>
+</template>
+
+<script>
+export default {
+  mounted () {
+    this.rellax = new Rellax(this.$refs.rellax) // [div, div, div]
+  }
+}
+</script>
+```
 
 ## In the Wild
 If you're using Rellax in production, we'd love to list you here! Let us know: moe@dixonandmoe.com

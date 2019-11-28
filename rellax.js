@@ -432,7 +432,12 @@
     };
 
     // Init
-    init();
+    document.onreadystatechange = () => {
+      if (document.readyState === 'complete') {
+        // document ready
+        init();
+      }
+    };
 
     // Allow to recalculate the initial values whenever we want
     self.refresh = init;

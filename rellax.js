@@ -23,7 +23,7 @@
     root.Rellax = factory();
   }
 }(typeof window !== "undefined" ? window : global, function () {
-  var Rellax = function(el, options){
+  var Rellax = function(el='.rellax', options){
     "use strict";
 
     var self = Object.create(Rellax.prototype);
@@ -121,11 +121,6 @@
 
     if (options && options.breakpoints) {
       validateCustomBreakpoints();
-    }
-
-    // By default, rellax class
-    if (!el) {
-      el = '.rellax';
     }
 
     // check if el is a className or a node

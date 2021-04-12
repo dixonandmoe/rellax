@@ -129,7 +129,7 @@
     }
 
     // check if el is a className or a node
-    var elements = typeof el === 'string' ? document.querySelectorAll(el) : [el];
+    var elements = typeof el === 'string' ? document.querySelectorAll(el) : HTMLCollection.prototype.isPrototypeOf(el) || NodeList.prototype.isPrototypeOf(el) ? el : [el];
 
     // Now query selector
     if (elements.length > 0) {

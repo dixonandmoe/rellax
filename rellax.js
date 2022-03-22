@@ -400,11 +400,12 @@
     // Checks if the target element to animate is within the ViewPort area
     // Used when the attribute 'leadByViewPort' is true.
     var isInViewport = function (e) {
-      var elementTop = $(e).offset().top - 100;
-      var elementBottom = elementTop + $(e).outerHeight() - 260;
+      var container = e.getBoundingClientRect();
+      var elementTop = (container.top + window.scrollY) - 100;
+      var elementBottom = elementTop + window.outerHeight - 260;
 
-      var viewportTop = $(window).scrollTop();
-      var viewportBottom = viewportTop + $(window).height();
+      var viewportTop = document.documentElement.scrollTop;
+      var viewportBottom = viewportTop + window.screen.height;
 
       if (elementBottom > viewportTop && elementTop < viewportBottom) {
         return true;

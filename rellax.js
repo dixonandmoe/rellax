@@ -399,9 +399,9 @@
 
     // Checks if the target element to animate is within the ViewPort area
     // Used when the attribute 'leadByViewPort' is true.
-    $.fn.isInViewport = function () {
-      var elementTop = $(this).offset().top - 100;
-      var elementBottom = elementTop + $(this).outerHeight() - 260;
+    var isInViewport = function (e) {
+      var elementTop = $(e).offset().top - 100;
+      var elementBottom = elementTop + $(e).outerHeight() - 260;
 
       var viewportTop = $(window).scrollTop();
       var viewportBottom = viewportTop + $(window).height();
@@ -416,7 +416,7 @@
 
     // Transform3d on parallax element
     var animate = function () {
-      if ((!self.options.leadByViewPort) || (self.options.leadByViewPort && $('#parallax-wrapper').isInViewport())) {
+      if ((!self.options.leadByViewPort) || (self.options.leadByViewPort && isInViewport(self.elems[0].parentNode))) {
         var positions;
         for (var i = 0; i < self.elems.length; i++) {
           // Determine relevant movement directions

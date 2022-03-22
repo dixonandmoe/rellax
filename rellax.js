@@ -23,7 +23,7 @@
     root.Rellax = factory();
   }
 }(typeof window !== "undefined" ? window : global, function () {
-  var Rellax = function (el, options) {
+  var Rellax = function(el, options){
     "use strict";
 
     var self = Object.create(Rellax.prototype);
@@ -42,7 +42,7 @@
       window.mozRequestAnimationFrame ||
       window.msRequestAnimationFrame ||
       window.oRequestAnimationFrame ||
-      function (callback) { return setTimeout(callback, 1000 / 60); };
+      function(callback){ return setTimeout(callback, 1000 / 60); };
 
     // store the id for later use
     var loopId = null;
@@ -51,30 +51,30 @@
     var supportsPassive = false;
     try {
       var opts = Object.defineProperty({}, 'passive', {
-        get: function () {
+        get: function() {
           supportsPassive = true;
         }
       });
       window.addEventListener("testPassive", null, opts);
       window.removeEventListener("testPassive", null, opts);
-    } catch (e) { }
+    } catch (e) {}
 
     // check what cancelAnimation method to use
     var clearLoop = window.cancelAnimationFrame || window.mozCancelAnimationFrame || clearTimeout;
 
     // check which transform property to use
-    var transformProp = window.transformProp || (function () {
-      var testEl = document.createElement('div');
-      if (testEl.style.transform === null) {
-        var vendors = ['Webkit', 'Moz', 'ms'];
-        for (var vendor in vendors) {
-          if (testEl.style[vendors[vendor] + 'Transform'] !== undefined) {
-            return vendors[vendor] + 'Transform';
+    var transformProp = window.transformProp || (function(){
+        var testEl = document.createElement('div');
+        if (testEl.style.transform === null) {
+          var vendors = ['Webkit', 'Moz', 'ms'];
+          for (var vendor in vendors) {
+            if (testEl.style[ vendors[vendor] + 'Transform' ] !== undefined) {
+              return vendors[vendor] + 'Transform';
+            }
           }
         }
-      }
-      return 'transform';
-    })();
+        return 'transform';
+      })();
 
     // Default Settings
     self.options = {
@@ -91,17 +91,17 @@
       verticalScrollAxis: "y",
       horizontalScrollAxis: "x",
       leadByViewPort: false,
-      callback: function () { },
+      callback: function() {},
     };
 
     // User defined options (might have more in the future)
-    if (options) {
-      Object.keys(options).forEach(function (key) {
+    if (options){
+      Object.keys(options).forEach(function(key){
         self.options[key] = options[key];
       });
     }
 
-    function validateCustomBreakpoints() {
+    function validateCustomBreakpoints () {
       if (self.options.breakpoints.length === 3 && Array.isArray(self.options.breakpoints)) {
         var isAscending = true;
         var isNumerical = true;
@@ -170,8 +170,8 @@
     };
 
     // Get and cache initial position of all elements
-    var cacheBlocks = function () {
-      for (var i = 0; i < self.elems.length; i++) {
+    var cacheBlocks = function() {
+      for (var i = 0; i < self.elems.length; i++){
         var block = createBlock(self.elems[i]);
         blocks.push(block);
       }
@@ -180,8 +180,8 @@
 
     // Let's kick this script off
     // Build array for cached element values
-    var init = function () {
-      for (var i = 0; i < blocks.length; i++) {
+    var init = function() {
+      for (var i = 0; i < blocks.length; i++){
         self.elems[i].style.cssText = blocks[i].style;
       }
 
@@ -209,20 +209,20 @@
     // We want to cache the parallax blocks'
     // values: base, top, height, speed
     // el: is dom object, return: el cache values
-    var createBlock = function (el) {
-      var dataPercentage = el.getAttribute('data-rellax-percentage');
-      var dataSpeed = el.getAttribute('data-rellax-speed');
-      var dataXsSpeed = el.getAttribute('data-rellax-xs-speed');
-      var dataMobileSpeed = el.getAttribute('data-rellax-mobile-speed');
-      var dataTabletSpeed = el.getAttribute('data-rellax-tablet-speed');
-      var dataDesktopSpeed = el.getAttribute('data-rellax-desktop-speed');
+    var createBlock = function(el) {
+      var dataPercentage = el.getAttribute( 'data-rellax-percentage' );
+      var dataSpeed = el.getAttribute( 'data-rellax-speed' );
+      var dataXsSpeed = el.getAttribute( 'data-rellax-xs-speed' );
+      var dataMobileSpeed = el.getAttribute( 'data-rellax-mobile-speed' );
+      var dataTabletSpeed = el.getAttribute( 'data-rellax-tablet-speed' );
+      var dataDesktopSpeed = el.getAttribute( 'data-rellax-desktop-speed' );
       var dataVerticalSpeed = el.getAttribute('data-rellax-vertical-speed');
       var dataHorizontalSpeed = el.getAttribute('data-rellax-horizontal-speed');
       var dataVericalScrollAxis = el.getAttribute('data-rellax-vertical-scroll-axis');
       var dataHorizontalScrollAxis = el.getAttribute('data-rellax-horizontal-scroll-axis');
-      var dataZindex = el.getAttribute('data-rellax-zindex') || 0;
-      var dataMin = el.getAttribute('data-rellax-min');
-      var dataMax = el.getAttribute('data-rellax-max');
+      var dataZindex = el.getAttribute( 'data-rellax-zindex' ) || 0;
+      var dataMin = el.getAttribute( 'data-rellax-min' );
+      var dataMax = el.getAttribute( 'data-rellax-max' );
       var dataMinX = el.getAttribute('data-rellax-min-x');
       var dataMaxX = el.getAttribute('data-rellax-max-x');
       var dataMinY = el.getAttribute('data-rellax-min-y');
@@ -252,8 +252,8 @@
         var scrollPosY = (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop);
         wrapperPosY = scrollPosY - self.options.wrapper.offsetTop;
       }
-      var posY = self.options.vertical ? (dataPercentage || self.options.center ? wrapperPosY : 0) : 0;
-      var posX = self.options.horizontal ? (dataPercentage || self.options.center ? self.options.wrapper ? self.options.wrapper.scrollLeft : (window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft) : 0) : 0;
+      var posY = self.options.vertical ? ( dataPercentage || self.options.center ? wrapperPosY : 0 ) : 0;
+      var posX = self.options.horizontal ? ( dataPercentage || self.options.center ? self.options.wrapper ? self.options.wrapper.scrollLeft : (window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft) : 0 ) : 0;
 
       var blockTop = posY + el.getBoundingClientRect().top;
       var blockHeight = el.clientHeight || el.offsetHeight || el.scrollHeight;
@@ -264,7 +264,7 @@
       // apparently parallax equation everyone uses
       var percentageY = dataPercentage ? dataPercentage : (posY - blockTop + screenY) / (blockHeight + screenY);
       var percentageX = dataPercentage ? dataPercentage : (posX - blockLeft + screenX) / (blockWidth + screenX);
-      if (self.options.center) { percentageX = 0.5; percentageY = 0.5; }
+      if(self.options.center){ percentageX = 0.5; percentageY = 0.5; }
 
       // Optional individual block speed as data attr, otherwise global speed
       var speed = (breakpoints && mapBreakpoints[currentBreakpoint] !== null) ? Number(mapBreakpoints[currentBreakpoint]) : (dataSpeed ? dataSpeed : self.options.speed);
@@ -294,9 +294,9 @@
 
         // Remove "transform" string and save the attribute
         if (delimiter) {
-          transform = " " + trimmedStyle.slice(11, delimiter).replace(/\s/g, '');
+          transform = " " + trimmedStyle.slice(11, delimiter).replace(/\s/g,'');
         } else {
-          transform = " " + trimmedStyle.slice(11).replace(/\s/g, '');
+          transform = " " + trimmedStyle.slice(11).replace(/\s/g,'');
         }
       }
 
@@ -327,7 +327,7 @@
     // set scroll position (posY, posX)
     // side effect method is not ideal, but okay for now
     // returns true if the scroll changed, false if nothing happened
-    var setPosition = function () {
+    var setPosition = function() {
       var oldY = posY;
       var oldX = posX;
 
@@ -357,7 +357,7 @@
     // Ahh a pure function, gets new transform value
     // based on scrollPosition and speed
     // Allow for decimal pixel values
-    var updatePosition = function (percentageX, percentageY, speed, verticalSpeed, horizontalSpeed) {
+    var updatePosition = function(percentageX, percentageY, speed, verticalSpeed, horizontalSpeed) {
       var result = {};
       var valueX = ((horizontalSpeed ? horizontalSpeed : speed) * (100 * (1 - percentageX)));
       var valueY = ((verticalSpeed ? verticalSpeed : speed) * (100 * (1 - percentageY)));
@@ -369,7 +369,7 @@
     };
 
     // Remove event listeners and loop again
-    var deferredUpdate = function () {
+    var deferredUpdate = function() {
       window.removeEventListener('resize', deferredUpdate);
       window.removeEventListener('orientationchange', deferredUpdate);
       (self.options.wrapper ? self.options.wrapper : window).removeEventListener('scroll', deferredUpdate);
@@ -380,7 +380,7 @@
     };
 
     // Loop
-    var update = function () {
+    var update = function() {
       if (setPosition() && pause === false) {
         animate();
 
@@ -400,26 +400,26 @@
     // Checks if the target element to animate is within the ViewPort area
     // Used when the attribute 'leadByViewPort' is true.
     var isInViewport = function (e) {
-      var container = e.getBoundingClientRect();
-      var elementTop = (container.top + window.scrollY) - 100;
-      var elementBottom = elementTop + window.outerHeight - 260;
+        var container = e.getBoundingClientRect();
+        var elementTop = (container.top + window.scrollY);
+        var elementBottom = elementTop + window.outerHeight;
 
-      var viewportTop = document.documentElement.scrollTop;
-      var viewportBottom = viewportTop + window.screen.height;
+        var viewportTop = document.documentElement.scrollTop;
+        var viewportBottom = viewportTop + window.screen.height;
 
-      if (elementBottom > viewportTop && elementTop < viewportBottom) {
-        return true;
-      }
-      else {
-        return false;
-      }
+        if (elementBottom > viewportTop && elementTop < viewportBottom) {
+            return true;
+        }
+        else {
+            return false;
+        }
     };
 
     // Transform3d on parallax element
-    var animate = function () {
+    var animate = function() {
       if ((!self.options.leadByViewPort) || (self.options.leadByViewPort && isInViewport(self.elems[0].parentNode))) {
         var positions;
-        for (var i = 0; i < self.elems.length; i++) {
+        for (var i = 0; i < self.elems.length; i++){
           // Determine relevant movement directions
           var verticalScrollAxis = blocks[i].verticalScrollAxis.toLowerCase();
           var horizontalScrollAxis = blocks[i].horizontalScrollAxis.toLowerCase();
@@ -455,10 +455,10 @@
 
           // Check if directional min limits are defined
           if (blocks[i].minY != null) {
-            positionY = positionY <= blocks[i].minY ? blocks[i].minY : positionY;
+              positionY = positionY <= blocks[i].minY ? blocks[i].minY : positionY;
           }
           if (blocks[i].minX != null) {
-            positionX = positionX <= blocks[i].minX ? blocks[i].minX : positionX;
+              positionX = positionX <= blocks[i].minX ? blocks[i].minX : positionX;
           }
 
           // Check if a max limit is defined
@@ -473,10 +473,10 @@
 
           // Check if directional max limits are defined
           if (blocks[i].maxY != null) {
-            positionY = positionY >= blocks[i].maxY ? blocks[i].maxY : positionY;
+              positionY = positionY >= blocks[i].maxY ? blocks[i].maxY : positionY;
           }
           if (blocks[i].maxX != null) {
-            positionX = positionX >= blocks[i].maxX ? blocks[i].maxX : positionX;
+              positionX = positionX >= blocks[i].maxX ? blocks[i].maxX : positionX;
           }
 
           var zindex = blocks[i].zindex;
@@ -490,8 +490,8 @@
       }
     };
 
-    self.destroy = function () {
-      for (var i = 0; i < self.elems.length; i++) {
+    self.destroy = function() {
+      for (var i = 0; i < self.elems.length; i++){
         self.elems[i].style.cssText = blocks[i].style;
       }
 

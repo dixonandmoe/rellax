@@ -201,12 +201,11 @@ If you're using Rellax in production, we'd love to list you here! Let us know: m
 - [Linux Man Pages](https://dashdash.io/)
 - [Laws of UX](https://lawsofux.com/)
 - [Finch](https://finch.io/)
+- [Embedded Payroll](https://robotist.com/embedded-payroll-api)
 - [Product Designer in San Francisco](https://moeamaya.com/)
-- [Cool Backgrounds](https://coolbackgrounds.io/)
 - [EthWorks](http://ethworks.io/)
 - [Lorem Ipsum Generator](https://loremipsumgenerator.com/)
 - [Deeson](https://www.deeson.co.uk/)
-- [Unlimited Designs](https://servicelist.io/)
 
 ## Development
 In the spirit of lightweight javascript, the build processes (thus far) is lightweight also.

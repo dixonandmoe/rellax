@@ -79,8 +79,8 @@
     // Default Settings
     self.options = {
       speed: -2,
-	    verticalSpeed: null,
-	    horizontalSpeed: null,
+      verticalSpeed: null,
+      horizontalSpeed: null,
       breakpoints: [576, 768, 1201],
       center: false,
       wrapper: null,
@@ -90,6 +90,7 @@
       horizontal: false,
       verticalScrollAxis: "y",
       horizontalScrollAxis: "x",
+      leadByViewPort: false,
       callback: function() {},
     };
 
@@ -396,77 +397,97 @@
       }
     };
 
+    // Checks if the target element to animate is within the ViewPort area
+    // Used when the attribute 'leadByViewPort' is true.
+    var isInViewport = function (e) {
+        var container = e.getBoundingClientRect();
+        var elementTop = (container.top + window.scrollY);
+        var elementBottom = elementTop + window.outerHeight;
+
+        var viewportTop = document.documentElement.scrollTop;
+        var viewportBottom = viewportTop + window.screen.height;
+
+        if (elementBottom > viewportTop && elementTop < viewportBottom) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+
     // Transform3d on parallax element
     var animate = function() {
-      var positions;
-      for (var i = 0; i < self.elems.length; i++){
-        // Determine relevant movement directions
-        var verticalScrollAxis = blocks[i].verticalScrollAxis.toLowerCase();
-        var horizontalScrollAxis = blocks[i].horizontalScrollAxis.toLowerCase();
-        var verticalScrollX = verticalScrollAxis.indexOf("x") != -1 ? posY : 0;
-        var verticalScrollY = verticalScrollAxis.indexOf("y") != -1 ? posY : 0;
-        var horizontalScrollX = horizontalScrollAxis.indexOf("x") != -1 ? posX : 0;
-        var horizontalScrollY = horizontalScrollAxis.indexOf("y") != -1 ? posX : 0;
+      if ((!self.options.leadByViewPort) || (self.options.leadByViewPort && isInViewport(self.elems[0].parentNode))) {
+        var positions;
+        for (var i = 0; i < self.elems.length; i++){
+          // Determine relevant movement directions
+          var verticalScrollAxis = blocks[i].verticalScrollAxis.toLowerCase();
+          var horizontalScrollAxis = blocks[i].horizontalScrollAxis.toLowerCase();
+          var verticalScrollX = verticalScrollAxis.indexOf("x") != -1 ? posY : 0;
+          var verticalScrollY = verticalScrollAxis.indexOf("y") != -1 ? posY : 0;
+          var horizontalScrollX = horizontalScrollAxis.indexOf("x") != -1 ? posX : 0;
+          var horizontalScrollY = horizontalScrollAxis.indexOf("y") != -1 ? posX : 0;
 
-        var percentageY = ((verticalScrollY + horizontalScrollY - blocks[i].top + screenY) / (blocks[i].height + screenY));
-        var percentageX = ((verticalScrollX + horizontalScrollX - blocks[i].left + screenX) / (blocks[i].width + screenX));
+          var percentageY = ((verticalScrollY + horizontalScrollY - blocks[i].top + screenY) / (blocks[i].height + screenY));
+          var percentageX = ((verticalScrollX + horizontalScrollX - blocks[i].left + screenX) / (blocks[i].width + screenX));
 
-        // Subtracting initialize value, so element stays in same spot as HTML
-        positions = updatePosition(percentageX, percentageY, blocks[i].speed, blocks[i].verticalSpeed, blocks[i].horizontalSpeed);
-        var positionY = positions.y - blocks[i].baseY;
-        var positionX = positions.x - blocks[i].baseX;
+          // Subtracting initialize value, so element stays in same spot as HTML
+          positions = updatePosition(percentageX, percentageY, blocks[i].speed, blocks[i].verticalSpeed, blocks[i].horizontalSpeed);
+          var positionY = positions.y - blocks[i].baseY;
+          var positionX = positions.x - blocks[i].baseX;
 
-        // The next two "if" blocks go like this:
-        // Check if a limit is defined (first "min", then "max");
-        // Check if we need to change the Y or the X
-        // (Currently working only if just one of the axes is enabled)
-        // Then, check if the new position is inside the allowed limit
-        // If so, use new position. If not, set position to limit.
+          // The next two "if" blocks go like this:
+          // Check if a limit is defined (first "min", then "max");
+          // Check if we need to change the Y or the X
+          // (Currently working only if just one of the axes is enabled)
+          // Then, check if the new position is inside the allowed limit
+          // If so, use new position. If not, set position to limit.
 
-        // Check if a min limit is defined
-        if (blocks[i].min !== null) {
-          if (self.options.vertical && !self.options.horizontal) {
-            positionY = positionY <= blocks[i].min ? blocks[i].min : positionY;
+          // Check if a min limit is defined
+          if (blocks[i].min !== null) {
+            if (self.options.vertical && !self.options.horizontal) {
+              positionY = positionY <= blocks[i].min ? blocks[i].min : positionY;
+            }
+            if (self.options.horizontal && !self.options.vertical) {
+              positionX = positionX <= blocks[i].min ? blocks[i].min : positionX;
+            }
           }
-          if (self.options.horizontal && !self.options.vertical) {
-            positionX = positionX <= blocks[i].min ? blocks[i].min : positionX;
+
+          // Check if directional min limits are defined
+          if (blocks[i].minY != null) {
+              positionY = positionY <= blocks[i].minY ? blocks[i].minY : positionY;
           }
-        }
-
-        // Check if directional min limits are defined
-        if (blocks[i].minY != null) {
-            positionY = positionY <= blocks[i].minY ? blocks[i].minY : positionY;
-        }
-        if (blocks[i].minX != null) {
-            positionX = positionX <= blocks[i].minX ? blocks[i].minX : positionX;
-        }
-
-        // Check if a max limit is defined
-        if (blocks[i].max !== null) {
-          if (self.options.vertical && !self.options.horizontal) {
-            positionY = positionY >= blocks[i].max ? blocks[i].max : positionY;
+          if (blocks[i].minX != null) {
+              positionX = positionX <= blocks[i].minX ? blocks[i].minX : positionX;
           }
-          if (self.options.horizontal && !self.options.vertical) {
-            positionX = positionX >= blocks[i].max ? blocks[i].max : positionX;
+
+          // Check if a max limit is defined
+          if (blocks[i].max !== null) {
+            if (self.options.vertical && !self.options.horizontal) {
+              positionY = positionY >= blocks[i].max ? blocks[i].max : positionY;
+            }
+            if (self.options.horizontal && !self.options.vertical) {
+              positionX = positionX >= blocks[i].max ? blocks[i].max : positionX;
+            }
           }
-        }
 
-        // Check if directional max limits are defined
-        if (blocks[i].maxY != null) {
-            positionY = positionY >= blocks[i].maxY ? blocks[i].maxY : positionY;
-        }
-        if (blocks[i].maxX != null) {
-            positionX = positionX >= blocks[i].maxX ? blocks[i].maxX : positionX;
-        }
+          // Check if directional max limits are defined
+          if (blocks[i].maxY != null) {
+              positionY = positionY >= blocks[i].maxY ? blocks[i].maxY : positionY;
+          }
+          if (blocks[i].maxX != null) {
+              positionX = positionX >= blocks[i].maxX ? blocks[i].maxX : positionX;
+          }
 
-        var zindex = blocks[i].zindex;
+          var zindex = blocks[i].zindex;
 
-        // Move that element
-        // (Set the new translation and append initial inline transforms.)
-        var translate = 'translate3d(' + (self.options.horizontal ? positionX : '0') + 'px,' + (self.options.vertical ? positionY : '0') + 'px,' + zindex + 'px) ' + blocks[i].transform;
-        self.elems[i].style[transformProp] = translate;
+          // Move that element
+          // (Set the new translation and append initial inline transforms.)
+          var translate = 'translate3d(' + (self.options.horizontal ? positionX : '0') + 'px,' + (self.options.vertical ? positionY : '0') + 'px,' + zindex + 'px) ' + blocks[i].transform;
+          self.elems[i].style[transformProp] = translate;
+        }
+        self.options.callback(positions);
       }
-      self.options.callback(positions);
     };
 
     self.destroy = function() {

@@ -3,6 +3,16 @@
   "version": "1.12.1",
   "description": "Lightweight, vanilla javascript parallax library",
   "main": "rellax.js",
+  "module": "rellax.esm.mjs",
+  "exports": {
+    ".": {
+      "import": "./rellax.esm.mjs",
+      "require": "./rellax.js",
+      "default": "./rellax.js"
+    },
+    "./rellax.min.js": "./rellax.min.js",
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

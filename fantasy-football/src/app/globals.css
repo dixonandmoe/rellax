@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens.
+ *
+ * Light is the default; dark is applied by a `dark` class on <html>, set before paint by
+ * the inline script in layout.tsx so there is no flash of the wrong theme.
+ */
+@theme {
+  --color-surface: oklch(99% 0.002 250);
+  --color-surface-raised: oklch(100% 0 0);
+  --color-border-subtle: oklch(92% 0.005 250);
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+html.dark body {
+  @apply bg-slate-950 text-slate-100;
+}
+
+/* Numeric columns should line up; tabular figures make tables readable. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
